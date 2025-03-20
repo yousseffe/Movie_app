@@ -16,6 +16,10 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_SERVER_USER,
     pass: process.env.EMAIL_SERVER_PASSWORD,
   },
+  pool: true, // ✅ Enable connection pooling
+  maxConnections: 5, // ✅ Maximum concurrent connections
+  maxMessages: 100, // ✅ Maximum messages per connection
+  rateLimit: 10,
 });
 
 interface EmailProps {
