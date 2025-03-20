@@ -300,11 +300,11 @@ export async function getMovies2(
     if (options.status) {
       query.status = options.status;
     }
-
+    console.log("query", query)
     let moviesQuery = Movie.find(query)
       .populate("genres")
       .sort({ createdAt: -1 });
-
+    console.log("moviesQuery", moviesQuery)
     if (options.limit) {
       moviesQuery = moviesQuery.limit(options.limit);
     }

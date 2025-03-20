@@ -38,15 +38,21 @@ async function sendEmail(
   try {
     // Render the component into static HTML
     const emailHtml = await render(React.createElement(EmailComponent, props));
-
     const mailOptions = {
       from: `"Movie Platform" <${process.env.EMAIL_FROM || "noreply@movieplatform.com"}>`,
       to,
       subject,
       html: emailHtml,
     };
-
+    console.log("SMTP Config:", {
+      host: process.env.EMAIL_SERVER_HOST,
+      port: process.env.EMAIL_SERVER_PORT,
+      secure: process.env.EMAIL_SERVER_SECURE,
+      user: process.env.EMAIL_SERVER_USER,
+    });
+    
     await transporter.sendMail(mailOptions);
+    console.log("email sent")
     return { success: true };
   } catch (error) {
     console.error(`Error sending email: ${subject}`, error);

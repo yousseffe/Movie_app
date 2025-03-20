@@ -154,6 +154,22 @@ export function RequestList({ requests }: RequestListProps) {
               <p className="mt-1 text-sm text-muted-foreground">{selectedRequest?.description}</p>
             </div>
 
+            {selectedRequest?.movieId && (
+              <div>
+                <h4 className="text-sm font-medium">Requested Movie</h4>
+                <p className="mt-1 text-sm">
+                  <a
+                    href={`/movies/${selectedRequest.movieId}`}
+                    target="_blank"
+                    className="text-primary hover:underline"
+                    rel="noreferrer"
+                  >
+                    View Movie
+                  </a>
+                </p>
+              </div>
+            )}
+
             {selectedRequest?.status !== "pending" && (
               <div>
                 <h4 className="text-sm font-medium">Admin Response</h4>
