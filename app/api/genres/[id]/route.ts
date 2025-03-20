@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
-import dbConnect from "@/lib/mongodb"
 import Genre from "@/models/Genre"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../auth/[...nextauth]/route"
+import connectToDatabase from "@/lib/mongodb"
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await dbConnect()
+    await connectToDatabase()
 
     const genre = await Genre.findById(params.id)
 
@@ -29,7 +29,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    await dbConnect()
+    await connectToDatabase()
 
     const data = await req.json()
 
@@ -54,7 +54,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    await dbConnect()
+    await connectToDatabase()
 
     const genre = await Genre.findByIdAndDelete(params.id)
 

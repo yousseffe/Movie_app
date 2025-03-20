@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { connectToDatabase } from "@/lib/mongodb"
+import  connectToDatabase  from "@/lib/mongodb"
 import User from "@/models/User"
 import Genre from "@/models/Genre"
 import Language from "@/models/Language"

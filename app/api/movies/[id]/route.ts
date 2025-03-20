@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
-import dbConnect from "@/lib/mongodb"
+import connectToDatabase from "@/lib/mongodb"
 import Movie from "@/models/Movie"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../auth/[...nextauth]/route"
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await dbConnect()
+    await connectToDatabase()
 
     const movie = await Movie.findById(params.id)
       .populate("genres")
@@ -35,7 +35,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
     }
 
-    await dbConnect()
+    await connectToDatabase()
 
     const data = await req.json()
     const movie = await Movie.findByIdAndUpdate(params.id, data, { new: true })
@@ -59,7 +59,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
     }
 
-    await dbConnect()
+    await connectToDatabase()
 
     const movie = await Movie.findByIdAndDelete(params.id)
 

@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
-import dbConnect from "@/lib/mongodb"
+import connectToDatabase from "@/lib/mongodb"
 import Movie from "@/models/Movie"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]/route"
 
 export async function GET(req: NextRequest) {
   try {
-    await dbConnect()
+    await connectToDatabase()
 
     const url = new URL(req.url)
     const limit = url.searchParams.get("limit") ? Number.parseInt(url.searchParams.get("limit")!) : undefined
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 })
     }
 
-    await dbConnect()
+    await connectToDatabase()
 
     const data = await req.json()
     const movie = new Movie(data)

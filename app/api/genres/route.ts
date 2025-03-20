@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
-import dbConnect from "@/lib/mongodb"
+import connectToDatabase from "@/lib/mongodb"
 import Genre from "@/models/Genre"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]/route"
 
 export async function GET(req: NextRequest) {
   try {
-    await dbConnect()
+    await connectToDatabase()
 
     const genres = await Genre.find({}).sort({ nameEnglish: 1 })
 
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    await dbConnect()
+    await connectToDatabase()
 
     const data = await req.json()
 
