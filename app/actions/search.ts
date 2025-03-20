@@ -49,4 +49,3 @@ export async function getSearchResults(query: string) {
     return { error: "Failed to get search results" }
   }
 }
-

@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search, Film, User, Loader2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { searchMovies, searchPeople } from "@/app/actions/search"
+import { searchMovies } from "@/app/actions/search"
 
 export function SearchDialog({ open, onOpenChange }) {
   const [query, setQuery] = useState("")
@@ -34,12 +34,12 @@ export function SearchDialog({ open, onOpenChange }) {
         }
       }
 
-      if (activeTab === "people" || activeTab === "all") {
-        const peopleResult = await searchPeople(query)
-        if (peopleResult.success) {
-          setPeople(peopleResult.data)
-        }
-      }
+      // if (activeTab === "people" || activeTab === "all") {
+      //   const peopleResult = await searchPeople(query)
+      //   if (peopleResult.success) {
+      //     setPeople(peopleResult.data)
+      //   }
+      // }
 
       setIsLoading(false)
     }, 300)
@@ -70,12 +70,12 @@ export function SearchDialog({ open, onOpenChange }) {
               <TabsTrigger value="movies" className="flex-1">
                 Movies
               </TabsTrigger>
-              <TabsTrigger value="people" className="flex-1">
+              {/* <TabsTrigger value="people" className="flex-1">
                 People
               </TabsTrigger>
               <TabsTrigger value="all" className="flex-1">
                 All
-              </TabsTrigger>
+              </TabsTrigger> */}
             </TabsList>
 
             <div className="mt-4 relative min-h-[300px]">
@@ -131,7 +131,7 @@ export function SearchDialog({ open, onOpenChange }) {
                 )}
               </TabsContent>
 
-              <TabsContent value="people" className="space-y-4">
+              {/* <TabsContent value="people" className="space-y-4">
                 {people.length === 0 ? (
                   <div className="text-center py-8">
                     <User className="h-12 w-12 mx-auto text-muted-foreground" />
@@ -265,7 +265,7 @@ export function SearchDialog({ open, onOpenChange }) {
                     )}
                   </>
                 )}
-              </TabsContent>
+              </TabsContent> */}
             </div>
           </Tabs>
         </div>

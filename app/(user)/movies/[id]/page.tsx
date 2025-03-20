@@ -29,7 +29,7 @@ export default async function MovieDetailPage({ params }: { params: { id: string
     : []
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col ">
       {/* Hero Section */}
       <section className="relative">
         <div className="relative h-[50vh] w-full overflow-hidden md:h-[60vh]">
@@ -41,7 +41,7 @@ export default async function MovieDetailPage({ params }: { params: { id: string
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background to-transparent opacity-60" />
+          {/* <div className="absolute inset-0 bg-gradient-to-r from-background to-transparent opacity-60" /> */}
         </div>
         <div className="container relative -mt-40 z-10">
           <div className="grid gap-6 md:grid-cols-[250px_1fr] lg:grid-cols-[300px_1fr]">

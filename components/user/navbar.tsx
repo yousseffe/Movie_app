@@ -15,13 +15,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { SearchDialog } from "@/components/search-dialog"
+// import { SearchDialog } from "@/components/search-dialog"
 import { useSession } from "next-auth/react"
 
 export function UserNavbar() {
   const pathname = usePathname()
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const [notifications, setNotifications] = useState([])
+  // const [isSearchOpen, setIsSearchOpen] = useState(false)
+  // const [notifications, setNotifications] = useState([])
   const { data: session } = useSession()
 
   const routes = [
@@ -94,10 +94,10 @@ export function UserNavbar() {
             ))}
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)}>
+            {/* <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)}>
               <Search className="h-5 w-5" />
               <span className="sr-only">Search</span>
-            </Button>
+            </Button> */}
 
             
               
@@ -133,7 +133,7 @@ export function UserNavbar() {
         </div>
       </header>
 
-      <SearchDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} />
+      {/* <SearchDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} /> */}
     </>
   )
 }
