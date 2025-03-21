@@ -27,13 +27,19 @@ export default async function MovieDetailPage({
 
   // Get related movies (in a real app, you would have a recommendation algorithm)
   const relatedMoviesResult = await getMovies({
-    limit: 5,
-    status: "published",
-  })
+    status: "published",       // Only get published movies
+    genre: movie.genre,        // Match movies from the same genre
+    // year: movie.year,          // (Optional) Get movies from the same year
+    sort: "newest",            // Show the newest movies first
+    limit: 5,                  // Fetch more movies (in case some get filtered out)
+  });
 
   const relatedMovies = relatedMoviesResult.success
-    ? relatedMoviesResult.data.filter((m) => m._id !== movie._id).slice(0, 3)
-    : []
+  ? relatedMoviesResult?.data
+      ?.filter((m) => m._id.toString() !== movie._id.toString())
+      .slice(0, 3)
+  : []
+
 
   const requestSuccess = searchParams.requestSuccess === "true"
 
@@ -173,7 +179,7 @@ export default async function MovieDetailPage({
             {movie.videos && movie.videos.filter((v) => !v.isTrailer).length > 0 ? (
               <div className="mt-8 border-t pt-6">
                 <h3 className="text-xl font-bold mb-4">Full Movie</h3>
-                <MovieAccessChecker movieId={movie._id.toString()}>
+                <MovieAccessChecker movieId={movie._id.toString()} movieName={movie.titleEnglish}>
                   <VideoPlayer
                     videos={movie.videos.filter((v) => !v.isTrailer)}
                     movieCover={movie.cover || "/placeholder.svg?height=600&width=1200"}

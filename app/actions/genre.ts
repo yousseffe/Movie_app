@@ -5,6 +5,7 @@ import Genre from "@/models/Genre"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../api/auth/[...nextauth]/route"
 import { revalidatePath } from "next/cache"
+import { generatePrimeSync } from "node:crypto"
 
 export async function createGenre(formData: FormData) {
   try {
@@ -116,7 +117,7 @@ export async function getGenres() {
     await connectToDatabase()
 
     const genres = await Genre.find({}).sort({ nameEnglish: 1 })
-    return { success: true, data: genres }
+    return { success: true, data: JSON.parse(JSON.stringify(genres)) }
   } catch (error) {
     console.error("Error fetching genres:", error)
     return { error: "Failed to fetch genres" }

@@ -6,17 +6,19 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus, Lock } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { requestMovie } from "@/app/actions/movie-request"
+import { checkRequested, requestMovie } from "@/app/actions/movie-request"
 import { useRouter } from "next/navigation"
 import { checkMovieAccess } from "@/app/actions/movie-request"
 
 interface MovieAccessCheckerProps {
   movieId: string
+  movieName: string
   children: React.ReactNode
 }
 
-export default function MovieAccessChecker({ movieId, children }: MovieAccessCheckerProps) {
+export default function MovieAccessChecker({ movieId, movieName, children }: MovieAccessCheckerProps) {
   const [hasAccess, setHasAccess] = useState<boolean | null>(null)
+  const [requested, setRequested] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isRequesting, setIsRequesting] = useState(false)
   const { toast } = useToast()
@@ -28,6 +30,8 @@ export default function MovieAccessChecker({ movieId, children }: MovieAccessChe
         setIsLoading(true)
         const result = await checkMovieAccess(movieId)
         setHasAccess(result.hasAccess)
+        const requested = await checkRequested(movieId)
+        setRequested(requested.hasAccess)
       } catch (error) {
         console.error("Error checking access:", error)
         setHasAccess(false)
@@ -42,7 +46,7 @@ export default function MovieAccessChecker({ movieId, children }: MovieAccessChe
   const handleRequestAccess = async () => {
     setIsRequesting(true)
     try {
-      const result = await requestMovie(movieId)
+      const result = await requestMovie(movieId, movieName)
       if (result.success) {
         toast({
           title: "Request Submitted",
@@ -64,6 +68,7 @@ export default function MovieAccessChecker({ movieId, children }: MovieAccessChe
       })
     } finally {
       setIsRequesting(false)
+      setRequested(true)
     }
   }
 
@@ -86,10 +91,14 @@ export default function MovieAccessChecker({ movieId, children }: MovieAccessChe
           <p className="text-muted-foreground max-w-md mx-auto">
             This content requires special access. Request access to watch the full movie.
           </p>
-          <Button onClick={handleRequestAccess} disabled={isRequesting} className="gap-2 mt-2">
-            <Plus className="h-4 w-4" />
-            {isRequesting ? "Submitting Request..." : "Request Access"}
-          </Button>
+          {!requested ? (
+            <Button onClick={handleRequestAccess} disabled={isRequesting} className="gap-2 mt-2">
+              <Plus className="h-4 w-4" />
+              {isRequesting ? "Submitting Request..." : "Request Access"}
+            </Button>
+          ) : (
+            <p className="text-muted-foreground">You have already requested access to this movie.</p>
+          )}
         </div>
       </div>
     )

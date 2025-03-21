@@ -1,27 +1,28 @@
-"use client"
-import { useEffect, useState } from "react"
-import { getMovieRequests } from "@/app/actions/movie-request"
-import { RequestList } from "@/components/admin/request-list"
+"use client";
+
+import { useEffect, useState } from "react";
+import { getMovieRequests } from "@/app/actions/movie-request";
+import { RequestList } from "@/components/admin/request-list";
 
 export default function AdminRequestsPage() {
-  const [requests, setRequests] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [requests, setRequests] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0); // Added to trigger re-renders
 
   useEffect(() => {
     async function fetchRequests() {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        const data = await getMovieRequests()
-        console.log(data)
-        setRequests(data)
+        const data = await getMovieRequests();
+        setRequests(data);
       } catch (error) {
-        console.error("Failed to fetch requests:", error)
+        console.error("Failed to fetch requests:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
-    fetchRequests()
-  }, [])
+    fetchRequests();
+  }, [refreshKey]); // Trigger fetch when refreshKey changes
 
   return (
     <div className="space-y-4">
@@ -34,9 +35,8 @@ export default function AdminRequestsPage() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       ) : (
-        <RequestList requests={requests} />
+        <RequestList requests={requests} setRefreshKey={setRefreshKey} />
       )}
     </div>
-  )
+  );
 }
-

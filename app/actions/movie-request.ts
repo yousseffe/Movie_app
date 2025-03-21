@@ -1,3 +1,7 @@
+import { requestMovie } from '@/app/actions/movie-request';
+import { requestMovie } from '@/app/actions/movie-request';
+import { requestMovie } from '@/app/actions/movie-request';
+// import { requestMovie } from '@/app/actions/movie-request';
 "use server"
 
 import { z } from "zod"
@@ -48,12 +52,9 @@ export async function getMovieRequests() {
     if (!session || session.user.role !== "admin") {
       throw new Error("Unauthorized")
     }
-    console.log("session", session)
     await connectToDatabase()
-    console.log("connected to database")
-    const requests = await MovieRequest.find().populate("user").sort({ createdAt: -1 })
-    console.log("requests", requests)
-    return requests
+    const requests = await MovieRequest.find().populate("user" , "name email").sort({ createdAt: -1 })
+    return JSON.parse(JSON.stringify(requests))
   } catch (error) {
     console.error("Failed to fetch movie requests:", error)
     return []
@@ -79,21 +80,20 @@ export async function updateMovieRequest(id: string, data: { status: string; adm
     request.status = data.status
     request.adminResponse = data.adminResponse
     await request.save()
-
     // If the request is approved and has a movieId, update the user's permissions
-    if (data.status === "approved" && request.movieId) {
+    if (data.status == "approved" && request.movie) {
       // Find the user
       const user = await User.findById(request.user)
-
       if (user) {
-        // Add the movie to the user's allowedMovies array if it doesn't already exist
-        if (!user.allowedMovies) {
-          user.allowedMovies = []
-        }
-
-        if (!user.allowedMovies.includes(request.movieId)) {
-          user.allowedMovies.push(request.movieId)
+        if(user.requestMovies.includes(request.movie)){
+          user.allowedMovies = user.allowedMovies || [] // Ensure the array exists
+          if (!user.allowedMovies.includes(request.movie)) {
+          user.allowedMovies.push(request.movie)
+          user.requestMovies = user.requestMovies = user.requestMovies.filter(
+            (id: string) => id.toString() !== request.movie.toString()
+          )
           await user.save()
+        }
         }
       }
     }
@@ -105,7 +105,7 @@ export async function updateMovieRequest(id: string, data: { status: string; adm
   }
 }
 
-export async function requestMovie(movieId: string) {
+export async function requestMovie(movieId: string , movieName: string) {
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
@@ -114,38 +114,21 @@ export async function requestMovie(movieId: string) {
 
     await connectToDatabase()
 
-    // Check if user already has a pending request for this movie
-    const existingRequest = await MovieRequest.findOne({
-      user: session.user.id,
-      movieId,
-      status: "pending",
-    })
-
-    if (existingRequest) {
-      return { error: "You already have a pending request for this movie" }
-    }
-
-    // Check if user already has an approved request for this movie
-    const approvedRequest = await MovieRequest.findOne({
-      user: session.user.id,
-      movieId,
-      status: "approved",
-    })
-
-    if (approvedRequest) {
-      return { error: "You already have access to this movie" }
-    }
-
     const request = new MovieRequest({
       title: "Request for full movie access",
-      description: `User has requested access to the full movie with ID: ${movieId}`,
+      description: `User has requested access to the full movie with ID: ${movieId} and name: ${movieName}`,
       user: session.user.id,
-      movieId,
+      movie: movieId,
       status: "pending",
     })
-
     await request.save()
-
+    const user = await User.findById(session.user.id)
+    if (!user) {
+      return { error: "User not found" }
+    }
+    user.requestMovies.push(movieId)
+    user.markModified("requestMovies") 
+      await user.save()
     return { success: true }
   } catch (error) {
     console.error("Movie request error:", error)
@@ -169,17 +152,34 @@ export async function checkMovieAccess(movieId: string) {
 
     // Check if the user has an approved request for this movie
     const user = await User.findById(session.user.id)
-
     if (!user) {
       return { hasAccess: false }
     }
 
     // Check if the movie is in the user's allowedMovies array
     const hasAccess = user.allowedMovies && user.allowedMovies.includes(movieId)
-
     return { hasAccess }
   } catch (error) {
     console.error("Error checking movie access:", error)
+    return { hasAccess: false }
+  }
+}
+
+export async function checkRequested(movieId: string) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session) {
+      return { hasAccess: false }
+    }
+    await connectToDatabase()
+    const user = await User.findById(session.user.id)
+    if (!user) {
+      return { hasAccess: false }
+    }
+    const requested = user.requestMovies && user.requestMovies?.includes(movieId)
+    return { hasAccess: requested }
+  } catch (error) {
+    console.error("Error checking requested movie:", error)
     return { hasAccess: false }
   }
 }

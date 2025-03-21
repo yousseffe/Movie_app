@@ -1,3 +1,5 @@
+import { requestMovie } from '@/app/actions/movie-request';
+import { requestMovie } from '@/app/actions/movie-request';
 import mongoose, { Schema, type Document } from "mongoose"
 
 export interface IUser extends Document {
@@ -14,7 +16,8 @@ export interface IUser extends Document {
   updatedAt: Date
   profilePicture: string
   watchlist: mongoose.Types.ObjectId[]
-  allowedMovies: string[] // Add this field to track which movies the user has access to
+  allowedMovies: mongoose.Types.ObjectId[]
+  requestMovies:  mongoose.Types.ObjectId[]
 }
 
 const UserSchema = new Schema<IUser>({
@@ -31,7 +34,8 @@ const UserSchema = new Schema<IUser>({
   updatedAt: { type: Date, default: Date.now },
   profilePicture: { type: String, default: "" },
   watchlist: [{ type: Schema.Types.ObjectId, ref: "Movie" }],
-  allowedMovies: [{ type: String }], 
+  allowedMovies: [ { type: Schema.Types.ObjectId, ref: "Movie" }], 
+  requestMovies: [{ type: Schema.Types.ObjectId, ref: "Movie"}]
 })
 
 // Create text index for search

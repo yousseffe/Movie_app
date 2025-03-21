@@ -1,3 +1,4 @@
+"use server"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -22,11 +23,11 @@ export default async function MoviesPage({
   const result = await getGenres()
   const genres = result.data
   // Get movies with filters
-  const genreFilter = searchParams.genre as string | string[]
-  const yearFilter = searchParams.year as string
-  const searchFilter = searchParams.search as string
-  const sortFilter = (searchParams.sort as string) || "newest" // Default sort is newest
-  const page = Number(searchParams.page) || 1 // Current page for pagination
+  const genreFilter = searchParams?.genre as string | string[]
+  const yearFilter = searchParams?.year as string
+  const searchFilter = searchParams?.search as string
+  const sortFilter = (searchParams?.sort as string) || "newest" // Default sort is newest
+  const page = Number(searchParams?.page) || 1 // Current page for pagination
 
   // Process genre filter (handle both single and multiple selections)
   const genreQuery = genreFilter

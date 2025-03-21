@@ -19,11 +19,12 @@ import { updateMovieRequest } from "@/app/actions/movie-request"
 
 interface RequestListProps {
   requests: any[]
+  setRefreshKey: React.Dispatch<React.SetStateAction<number>>
 }
 
-export function RequestList({ requests }: RequestListProps) {
+export function RequestList({ requests , setRefreshKey }: RequestListProps) {
   const [selectedRequest, setSelectedRequest] = useState<any | null>(null)
-  const [action, setAction] = useState<"approve" | "reject" | null>(null)
+  const [action, setAction] = useState<"approved" | "rejected" | null>(null)
   const [response, setResponse] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
@@ -34,13 +35,15 @@ export function RequestList({ requests }: RequestListProps) {
     setIsSubmitting(true)
 
     try {
+      console.log("selectedRequest", selectedRequest)
       await updateMovieRequest(selectedRequest._id, {
         status: action,
         adminResponse: response,
       })
-
+      console.log("updated request")
       router.refresh()
       handleClose()
+      setRefreshKey((prev) => prev + 1)
     } catch (error) {
       console.error("Failed to update request:", error)
     } finally {
@@ -91,7 +94,7 @@ export function RequestList({ requests }: RequestListProps) {
               requests.map((request) => (
                 <TableRow key={request._id}>
                   <TableCell className="font-medium">{request.title}</TableCell>
-                  <TableCell>{request.user.name}</TableCell>
+                  <TableCell>{request.user?.name}</TableCell>
                   <TableCell>{new Date(request.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>{getStatusBadge(request.status)}</TableCell>
                   <TableCell>
@@ -103,7 +106,7 @@ export function RequestList({ requests }: RequestListProps) {
                           className="h-8 w-8 p-0"
                           onClick={() => {
                             setSelectedRequest(request)
-                            setAction("approve")
+                            setAction("approved")
                           }}
                         >
                           <Check className="h-4 w-4 text-green-500" />
@@ -114,7 +117,7 @@ export function RequestList({ requests }: RequestListProps) {
                           className="h-8 w-8 p-0"
                           onClick={() => {
                             setSelectedRequest(request)
-                            setAction("reject")
+                            setAction("rejected")
                           }}
                         >
                           <X className="h-4 w-4 text-red-500" />
@@ -199,11 +202,11 @@ export function RequestList({ requests }: RequestListProps) {
                   Cancel
                 </Button>
                 <Button
-                  variant={action === "approve" ? "default" : "destructive"}
+                  variant={action === "approved" ? "default" : "destructive"}
                   onClick={handleAction}
                   disabled={isSubmitting}
                 >
-                  {action === "approve" ? "Approve" : "Reject"}
+                  {action === "approved" ? "Approved" : "Rejected"}
                 </Button>
               </>
             ) : (
